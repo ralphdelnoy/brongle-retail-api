@@ -34,7 +34,7 @@ if(is_array($jsonArr)){
 	$rows=$meta['rows'];//the number of articles that exsists in the current page
 	//END get meta data	
 	$api_fields='id,se_brand,se_serie,price';//limit requesting fields to ID, SE_BRAND, SE_SERIE and PRICE
-	//loop trough all pages
+	//loop trough all pages - (NOTE: this is the part where its recommended (+/- with more then 1000 articles) to to read the underneath chunks with separated file requests instead of reading chunks within this one file request)
 	for($p=1; $p<$totalPages; $p++){
 		$currentPage=$p;
 		$data=curl($api_domain.'/brongle/API_RET/articles/feed.php?key='.$api_key.'&page='.$currentPage.'&fields='.$api_fields);
