@@ -17,10 +17,11 @@ function curl($url){
 	return $output;
 }
 
+$api_domain='https://demo.brongle.com';//fill in the domain of the end-point to be used
 $api_key='YOUR-API-KEY';//your api key
 $api_page=1;//page to start with
 $api_fields='id,saved';//article fields to request - a star '*' will result in requesting all avaialable fields
-$data=curl('https://model.brongle.com/brongle/API_RET/articles/feed.php?key='.$api_key.'&page='.$api_page.'&fields='.$api_fields);
+$data=curl($api_domain.'/brongle/API_RET/articles/feed.php?key='.$api_key.'&page='.$api_page.'&fields='.$api_fields);
 $jsonArr = json_decode($data, true);//decode json string to associative array
 
 if(is_array($jsonArr)){
@@ -36,7 +37,7 @@ if(is_array($jsonArr)){
 	//loop trough all pages
 	for($p=1; $p<$totalPages; $p++){
 		$currentPage=$p;
-		$data=curl('https://model.brongle.com/brongle/API_RET/articles/feed.php?key='.$api_key.'&page='.$currentPage.'&fields='.$api_fields);
+		$data=curl($api_domain.'/brongle/API_RET/articles/feed.php?key='.$api_key.'&page='.$currentPage.'&fields='.$api_fields);
 		$jsonArr = json_decode($data, true);
 		//BEGIN get meta data
 		$meta=$jsonArr['meta'];//array with meta data of json
