@@ -29,8 +29,7 @@ if($act=='ini'){
 		//BEGIN get meta data
 		$meta=$jsonArr['meta'];//array with meta data of json
 		//tranfer meta data to locals
-		$totalPages=$meta['totalPages'];
-		$page=$meta['page'];//the current page number
+		$totalPages=$meta['totalPages'];//get the totalPages
 		//END get meta data		
 		$act='loadArts';
 	}
@@ -43,7 +42,7 @@ if($act=='ini'){
 if($act=='loadArts'){
 	//catch up required get parameters
 	$totalPages=(isset($_GET['totalPages'])) ? $_GET['totalPages'] : $totalPages;
-	$page=(isset($_GET['page'])) ? $_GET['page'] : $page;
+	$page=(isset($_GET['page'])) ? $_GET['page'] : 1;
 	$api_fields='id,se_brand,se_serie,price';//limit requesting fields to ID, SE_BRAND, SE_SERIE and PRICE
 	$data=curl($api_domain.'/brongle/API_RET_V1/articles/feed.php?key='.$api_key.'&page='.$page.'&fields='.$api_fields);
 	$jsonArr = json_decode($data, true);
