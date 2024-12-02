@@ -42,7 +42,7 @@ if($act=='ini'){
 if($act=='loadArts'){
 	//catch up required get parameters
 	$totalPages=(isset($_GET['totalPages'])) ? $_GET['totalPages'] : $totalPages;
-	$page=(isset($_GET['page'])) ? $_GET['page'] : 1;
+	$page=(isset($_GET['page'])) ? $_GET['page'] : $api_page;
 	$api_fields='id,se_brand,se_serie,price';//limit requesting fields to ID, SE_BRAND, SE_SERIE and PRICE
 	$data=curl($api_domain.'/brongle/API_RET_V1/articles/feed.php?key='.$api_key.'&page='.$page.'&fields='.$api_fields);
 	$jsonArr = json_decode($data, true);
