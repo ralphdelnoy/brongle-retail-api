@@ -62,7 +62,7 @@ if($act=='loadArts'){
 	if($page<$totalPages){
 		$page++;
 		//relaunche this file to load next page
-		print '<meta http-equiv="refresh" content="0 url=apiExample_php.php?totalPages='.$totalPages.'&page='.$page.'">';
+		print '<meta http-equiv="refresh" content="0 url=apiExample_php.php?act='.$act.'&totalPages='.$totalPages.'&page='.$page.'">';
 	}
 	else{
 		print "All pages where succesfully loaded<br>";	
