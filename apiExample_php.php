@@ -20,10 +20,10 @@ function curl($url){
 	return $out;
 }
 
-$api_domain='';//domain of licence holder
-$api_key='';//api key
-$api_page=1;//1-based paging
-$api_fields='id,saved';//fields to collect
+$api_domain='demo.brongle.com';//domain of licence holder
+$api_key='YOUR-API-KEY';//your api key
+$api_page=1;//page to start with
+$api_fields='id,saved';//article fields to request - a star '*' will result in requesting all avaialable fields
 
 $act=(isset($_GET['act'])) ? $_GET['act'] : 'ini';
 
@@ -72,3 +72,4 @@ if($act=='loadArts'){
 }
 
 ?>
+
