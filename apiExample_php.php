@@ -1,73 +1,74 @@
 <?php
 
-//curl method
+header('Content-Type: text/html; charset=utf-8');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+header('Expires: 0');
+
 function curl($url){
-	$ch = curl_init();// create curl resource
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 30); //timeout in seconds
-	curl_setopt($ch, CURLOPT_URL, $url);//set url
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);//return the transfer as a string
-	curl_setopt($ch, CURLOPT_AUTOREFERER, true);//follow a location redirect
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//follow a header redirect
-	$output = curl_exec($ch);//output contains the output string
-	curl_close($ch);// close curl resource to free up system resources	
-	return $output;
+	$ch=curl_init();
+	curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,30);
+	curl_setopt($ch,CURLOPT_TIMEOUT,30);
+	curl_setopt($ch,CURLOPT_URL,$url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+	curl_setopt($ch,CURLOPT_AUTOREFERER,true);
+	curl_setopt($ch,CURLOPT_FOLLOWLOCATION,true);
+	$out=curl_exec($ch);
+	curl_close($ch);
+	return $out;
 }
 
-$api_domain='https://demo.brongle.com';//fill in the domain of the end-point to be used
-$api_key='YOUR-API-KEY';//your api key
-$api_page=1;//page to start with
-$api_fields='id,saved';//article fields to request - a star '*' will result in requesting all avaialable fields
+$api_domain='';//domain of licence holder
+$api_key='';//api key
+$api_page=1;//1-based paging
+$api_fields='id,saved';//fields to collect
 
 $act=(isset($_GET['act'])) ? $_GET['act'] : 'ini';
 
 if($act=='ini'){
 	$data=curl($api_domain.'/brongle/API_RET_V1/articles/feed.php?key='.$api_key.'&page='.$api_page.'&fields='.$api_fields);
-	$jsonArr = json_decode($data, true);//decode json string to associative array
-	if(is_array($jsonArr)){
-		//BEGIN get meta data
-		$meta=$jsonArr['meta'];//array with meta data of json
-		//tranfer meta data to locals
-		$totalPages=$meta['totalPages'];//get the totalPages
-		//END get meta data		
-		$act='loadArts';
+	$jsonArr=json_decode($data,true);
+
+	if(!isset($jsonArr['meta'],$jsonArr['DATA'])){
+		die('no data available');
 	}
-	else{
-		print "no data available";	
-	}
+
+	$totalPages=(int)$jsonArr['meta']['totalPages'];
+	$act='loadArts';
 }
 
-
 if($act=='loadArts'){
-	//catch up required get parameters
-	$totalPages=(isset($_GET['totalPages'])) ? $_GET['totalPages'] : $totalPages;
-	$page=(isset($_GET['page'])) ? $_GET['page'] : $api_page;
-	$api_fields='id,se_brand,se_serie,price';//limit requesting fields to ID, SE_BRAND, SE_SERIE and PRICE
+	$totalPages=(isset($_GET['totalPages'])) ? (int)$_GET['totalPages'] : $totalPages;
+	$page=(isset($_GET['page'])) ? (int)$_GET['page'] : $api_page;
+
+	$api_fields='id,se_brand,se_serie,price';
 	$data=curl($api_domain.'/brongle/API_RET_V1/articles/feed.php?key='.$api_key.'&page='.$page.'&fields='.$api_fields);
-	$jsonArr = json_decode($data, true);
-	//BEGIN get meta data
-	$meta=$jsonArr['meta'];//array with meta data of json
-	$rows=$meta['rows'];//the number of articles that exsists in the current page
-	//END get meta data
-	//BEGIN get article data
-	$articles=$jsonArr['DATA'];//array with articles data
-		for($a=0; $a<$rows; $a++){
-			//output for testing
-			print 'id='.$articles[$a]['id'].' se_brand='.$articles[$a]['se_brand'].' se_serie='.$articles[$a]['se_serie'].' price='.$articles[$a]['price'].'<br>';
-			//here your database insert/update handling
-			//..
-		}
-	//END get article data	
-	if($page<$totalPages){
+	$jsonArr=json_decode($data,true);
+
+	if(!isset($jsonArr['DATA'])){
+		die('no article data');
+	}
+
+	$articles=$jsonArr['DATA'];
+	$rows=(isset($jsonArr['meta']['rows'])) ? (int)$jsonArr['meta']['rows'] : count($articles);
+
+	for($a=0;$a<$rows;$a++){
+		print 'id='.$articles[$a]['id'].
+		      ' se_brand='.$articles[$a]['se_brand'].
+		      ' se_serie='.$articles[$a]['se_serie'].
+		      ' price='.$articles[$a]['price'].'<br>';
+	}
+
+	if($page < $totalPages){
 		$page++;
-		//relaunche this file to load next page
-		print '<meta http-equiv="refresh" content="0 url=apiExample_php.php?act='.$act.'&totalPages='.$totalPages.'&page='.$page.'">';
+        usleep(100000); //0.1 sec
+		print '<meta http-equiv="refresh" content="0;url='.$_SERVER['PHP_SELF'].'?act='.$act.'&totalPages='.$totalPages.'&page='.$page.'">';$page.'">';
 	}
 	else{
-		print "All pages where succesfully loaded<br>";	
+		print 'All pages where successfully loaded<br>';
 	}
-	
 }
 
 ?>
